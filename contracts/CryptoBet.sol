@@ -70,6 +70,11 @@ contract CryptoBet is Ownable(msg.sender){
     voteOnTwo = 0;
    }
 
+   function window(bool open) public onlyOwner() returns(bool) {
+    _window = open;
+    return _window;
+   }
+
    // ======= MODIFIER ==========
 
    modifier checkWindow() {
