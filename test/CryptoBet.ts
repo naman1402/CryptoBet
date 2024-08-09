@@ -1,7 +1,5 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { exec } from "child_process";
-import { createPrivateKey } from "crypto";
 import { ethers } from "hardhat";
 
 describe("CryptoBet", function () {
@@ -70,7 +68,23 @@ describe("CryptoBet", function () {
             await token.connect(players[1]).approve(await cryptoBet.getAddress(), ethers.parseUnits('2', '20'))
             await cryptoBet.connect(players[1]).bet(1)
             await expect(cryptoBet.connect(players[1]).bet(1)).to.be.revertedWithoutReason()
+        })
+    })
 
+    describe("Settling bet", function() {
+        it("successful settling of bets", async function() {
+            const { cryptoBet, token, players, owner } = await loadFixture(deployTokenFixture)
+            for(let i = 0; i < 20; i++) {
+                await token.mint(players[i].address, ethers.parseUnits('1', '20'))
+                await token.connect(players[i]).approve(await cryptoBet.getAddress(), ethers.parseUnits('1', '20'))
+                if (i != 19) {
+                    await cryptoBet.connect(players[i]).bet(0)
+                }
+            }
+            await cryptoBet.connect(players[19]).bet(1)
+            await token.approve(await cryptoBet.getAddress(), ethers.parseUnits('20' ,'20'))
+            await cryptoBet.settle(1)
+            expect(await token.balanceOf(players[19].address)).to.equal(ethers.parseUnits('20', '20'))
         })
     })
 })

@@ -21,8 +21,8 @@ contract CryptoBet is Ownable(msg.sender){
     uint256 public voteOnOne;
     uint256 public voteOnTwo;
 
-    constructor(Token token, uint256 betPrice) {
-        _token = token;
+    constructor(address token, uint256 betPrice) {
+        _token = Token(token);
         _betPrice = betPrice;
         _window = true;
         _playerId = 1;
